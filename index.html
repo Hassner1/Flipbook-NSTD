@@ -31,6 +31,7 @@
 </head>
 <body>
     <div id="flipbook"></div>
+
     <script>
         $(document).ready(function() {
             setTimeout(function() {
@@ -39,23 +40,22 @@
                     return;
                 }
 
-                var totalPages = 67; // Set the correct number of pages
+                var totalPages = 67; // Set total number of pages
                 var flipbook = $('#flipbook');
 
-                // Ensure the flipbook container is properly initialized
+                // First, create the pages inside the div
+                for (var i = 1; i <= totalPages; i++) {
+                    flipbook.append('<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>');
+                }
+
+                // Now initialize the flipbook
                 flipbook.turn({
                     width: 800,
                     height: 500,
                     autoCenter: true,
                     display: 'double',
-                    acceleration: true,
-                    pages: totalPages
+                    acceleration: true
                 });
-
-                // Dynamically add pages after initialization
-                for (var i = 1; i <= totalPages; i++) {
-                    flipbook.turn('addPage', '<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>', i);
-                }
 
                 // Click to turn pages
                 flipbook.on('click', function(event) {
@@ -82,6 +82,7 @@
                         $(document).off('touchmove');
                     });
                 });
+
             }, 1000);
         });
     </script>
