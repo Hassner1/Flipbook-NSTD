@@ -82,7 +82,7 @@
       height: 100%;
       position: relative;
       /* Tiny negative margin to reduce gap between pages */
-      margin: 0 -1px; 
+      margin: 0 -5px; 
     }
 
     /* If not blurred, normal page. If blurred, we add a style inline. */
@@ -136,7 +136,7 @@
 
         // Updated to 68 pages
         var totalPages = 68;
-        // Pages you want blurred at 0.5px
+        // Pages you want blurred at 1px
         var blurredPages = [14, 15, 16, 17, 18, 20, 21, 26, 39, 40, 41, 42, 43, 44, 64, 65];
         var $flipbook = $('#flipbook');
 
@@ -145,7 +145,7 @@
           let extraStyle = '';
           if (blurredPages.includes(i)) {
             // Add inline blur to the img
-            extraStyle = 'style="filter: blur(0.5px);"';
+            extraStyle = 'style="filter: blur(1px);"';
           }
           var pageHTML = `
             <div class="page">
