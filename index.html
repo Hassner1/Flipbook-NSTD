@@ -32,11 +32,11 @@
       position: relative;
     }
 
-    /* UI CONTAINER (Flipbook + Arrows) */
+    /* UI CONTAINER */
     #ui-container {
-      opacity: 0; /* Hidden until fade-in */
-      /* Longer fade: 2s, starts after 1s delay => total 3s until fully visible */
-      transition: opacity 2s ease 1s; 
+      opacity: 0;  
+      /* 1s fade-in, starting after 0.5s delay => total 1.5s until visible */
+      transition: opacity 1s ease 0.5s; 
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -53,8 +53,8 @@
     /* FLIPBOOK CONTAINER */
     .container {
       position: relative;
-      width: 1200px;
-      height: 850px;
+      width: 1080px;
+      height: 765px;
       background: #ffffff;
       display: flex;
       align-items: center;
@@ -63,11 +63,12 @@
 
     /* FLIPBOOK */
     #flipbook {
-      width: 1200px;
-      height: 850px;
+      width: 1080px;
+      height: 765px;
       background: #ffffff;
-      opacity: 0;      /* start hidden */
-      transition: opacity 2s ease; /* 2s fade after we trigger it in JS */
+      opacity: 0;      
+      /* 1s fade, triggered after a 2s delay in JS => 3s total */
+      transition: opacity 1s ease; 
       z-index: 1;
     }
     #flipbook.show {
@@ -87,18 +88,18 @@
       background: #ffffff;
     }
 
-    /* HOME BUTTON (Top Right) */
+    /* HOME BUTTON (TOP RIGHT) */
     .home-button {
       position: absolute;
       top: 20px;
-      right: 20px;  /* Moved to top-right corner */
+      right: 20px; 
       z-index: 999; 
       width: 50px;
       height: 50px;
       cursor: pointer;
       opacity: 0.8;
-      /* Slower color change: 0.5s */
-      transition: stroke 0.5s ease;
+      /* Hover animation: 0.5s */
+      transition: stroke 0.5s ease; 
       user-select: none;
     }
     .home-button path {
@@ -119,13 +120,12 @@
       transform: translateY(-50%);
       cursor: pointer;
       z-index: 2;
-      opacity: 0.7;
-      /* Slower color change: 0.5s */
-      transition: stroke 0.5s ease;
+      opacity: 0;  /* start fully transparent, we’ll fade them in after flipbook */
+      /* hover animation 0.5s, plus fade for opacity */
+      transition: stroke 0.5s ease, opacity 1s ease; 
       user-select: none;
       width: 60px;
       height: 60px;
-      display: none; /* We'll show them after 2s, see JS below */
     }
     .arrow path {
       stroke: #57362b;
@@ -148,7 +148,7 @@
     @media (max-width: 1300px) {
       .container {
         width: 90vw;
-        height: calc(90vw * 850 / 1200);
+        height: calc(90vw * 765 / 1080);
       }
       #flipbook {
         width: 100%;
@@ -170,7 +170,7 @@
     @media (max-width: 768px) {
       .container {
         width: 95vw;
-        height: calc(95vw * 850 / 1200);
+        height: calc(95vw * 765 / 1080);
       }
       .arrow {
         width: 40px;
@@ -188,24 +188,24 @@
   </style>
 </head>
 <body>
-  <!-- UI Container (flipbook + arrows) -->
+  <!-- UI Container -->
   <div id="ui-container">
-    <!-- HOME BUTTON (House Icon) Top Right -->
+    <!-- HOME BUTTON (Top Right) -->
     <svg class="home-button" viewBox="0 0 24 24"
          onclick="window.open('https://mikeydoesart.ju.mp/', '_blank')">
       <path d="M3 9.5 L12 3 L21 9.5 V21 H3 Z" />
     </svg>
 
-    <!-- FLIPBOOK CONTAINER -->
     <div class="container">
-      <!-- LEFT ARROW (Hidden by default) -->
+      <!-- LEFT ARROW -->
       <svg class="arrow left-arrow" viewBox="0 0 24 24">
         <path d="M15 4 L8 12 L15 20" />
       </svg>
 
+      <!-- FLIPBOOK -->
       <div id="flipbook"></div>
 
-      <!-- RIGHT ARROW (Hidden by default) -->
+      <!-- RIGHT ARROW -->
       <svg class="arrow right-arrow" viewBox="0 0 24 24">
         <path d="M9 4 L16 12 L9 20" />
       </svg>
@@ -213,18 +213,21 @@
   </div>
 
   <script>
+    // Disable Right-Click
+    document.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+    }, false);
+
     $(document).ready(function() {
       // 1) Start UI fade after page load
-      //    0.5s waiting + 2s fade => total 2.5s
       setTimeout(function() {
         document.getElementById('ui-container').classList.add('show');
       }, 500);
 
-      // 2) Initialize flipbook after the UI is fully visible
-      //    UI fade = 2s + 1s initial delay => 3s total
+      // 2) Initialize flipbook after UI is fully visible + extra delay
       setTimeout(function() {
         initFlipbook();
-      }, 3000); // Start flipbook after the UI container is done fading
+      }, 2000);
     });
 
     function initFlipbook() {
@@ -232,7 +235,7 @@
         console.error('Turn.js did not load.');
         return;
       }
-      
+
       var totalPages = 68; 
       var $flipbook = $('#flipbook');
 
@@ -245,10 +248,10 @@
         `);
       }
 
-      // Initialize Turn.js with no gradients
+      // Initialize Turn.js
       $flipbook.turn({
-        width: 1200,
-        height: 850,
+        width: 1080,
+        height: 765,
         autoCenter: true,
         display: 'double',
         pages: totalPages,
@@ -257,54 +260,47 @@
         gradients: false,
         when: {
           turned: function(e, page) {
-            // Hide left arrow if on first page
+            // Hide left arrow on first page
             if (page === 1) {
-              $('.left-arrow').hide();
+              $('.left-arrow').css('opacity', 0);
             } else {
-              $('.left-arrow').show();
+              $('.left-arrow').css('opacity', 1);
             }
-            // Hide right arrow if on last page
+            // Hide right arrow on last page
             if (page === totalPages) {
-              $('.right-arrow').hide();
+              $('.right-arrow').css('opacity', 0);
             } else {
-              $('.right-arrow').show();
+              $('.right-arrow').css('opacity', 1);
             }
           }
         }
       });
 
-      // 3) Fade the flipbook in (2s fade in)
+      // 3) Fade the flipbook in
       setTimeout(function(){
         $flipbook.addClass('show');
-      }, 500);
+      }, 300);
 
-      // 4) Show arrows 2s AFTER everything else
-      //    So we wait 2 seconds from now
+      // 4) Show arrows after flipbook is visible
       setTimeout(function() {
-        // If page != 1 => show left arrow
+        // If not on page 1 => show left arrow
         if ($flipbook.turn('page') !== 1) {
-          $('.left-arrow').show();
+          $('.left-arrow').css('opacity', 1);
         }
-        // If page != last => show right arrow
+        // If not on last page => show right arrow
         if ($flipbook.turn('page') !== totalPages) {
-          $('.right-arrow').show();
+          $('.right-arrow').css('opacity', 1);
         }
       }, 2000);
     }
 
-    // ARROW Navigation
+    // Arrow Navigation
     $(document).on('click', '.left-arrow', function() {
       $('#flipbook').turn('previous');
     });
     $(document).on('click', '.right-arrow', function() {
       $('#flipbook').turn('next');
     });
-  </script>
-<!-- Disable Right-Click -->
-  <script>
-    document.addEventListener('contextmenu', function(e){
-      e.preventDefault();
-    }, false);
   </script>
 </body>
 </html>
