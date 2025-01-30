@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Simple Turn.js Flipbook</title>
+  <title>Responsive Turn.js Flipbook</title>
   <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="turn.min.js"></script> <!-- Or your local Turn.js if CDN is blocked -->
@@ -13,10 +13,12 @@
   <style>
     /* RESET */
     * {
-      margin: 0; padding: 0; box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* BODY */
+    /* BASIC PAGE STYLES */
     body {
       background-color: #ffffff;
       display: flex;
@@ -31,15 +33,15 @@
 
     /* UI CONTAINER (Link + Flipbook Container) */
     #ui-container {
-      /* Start invisible for fade-in */
-      opacity: 0;
-      transition: opacity 1s ease 0.5s; /* Fade in over 1s, starts after 0.5s delay */
+      opacity: 0; /* Hidden until fade-in */
+      transition: opacity 1s ease 0.5s; /* Fade in over 1s after 0.5s delay */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      width: 100%;
+      height: 100%;
     }
-    /* Once we add .show, it will fade in */
     #ui-container.show {
       opacity: 1;
     }
@@ -48,7 +50,7 @@
     #back-link {
       display: block;
       text-align: center;
-      margin: 15px auto;  /* space above flipbook */
+      margin: 15px auto;
       font-size: 24px;
       font-weight: bold;
       color: #57362b;
@@ -63,27 +65,27 @@
     /* FLIPBOOK CONTAINER */
     .container {
       position: relative;
-      width: 1200px;
-      height: 850px;
+      width: 1200px;  /* Desktop size */
+      height: 850px;  /* Desktop size */
       background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* FLIPBOOK */
+    /* The flipbook gets a fade-in after Turn.js init */
     #flipbook {
       width: 1200px;
       height: 850px;
       background: #ffffff;
-      opacity: 0; /* For second fade-in */
-      transition: opacity 1s ease; /* We'll trigger this AFTER the UI container appears */
+      opacity: 0;
+      transition: opacity 1s ease; /* fade time (no delay here, we trigger it in JS) */
     }
     #flipbook.show {
       opacity: 1;
     }
 
-    /* PAGES */
+    /* Each page is full-size, white BG behind the image */
     #flipbook .page {
       width: 100%;
       height: 100%;
@@ -101,16 +103,17 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 50px;
-      color: #57362b;
       cursor: pointer;
       z-index: 100;
       opacity: 0.7;
       transition: color 0.75s ease;
       user-select: none;
+      width: 50px;         /* SVG container width */
+      height: 50px;        /* SVG container height */
+      fill: #57362b;       /* Arrow color */
     }
     .arrow:hover {
-      color: #8b5e48;
+      fill: #8b5e48;       /* On hover, arrow changes color */
     }
     .left-arrow {
       left: -60px;
@@ -118,45 +121,96 @@
     .right-arrow {
       right: -60px;
     }
+
+    /* --- RESPONSIVE MEDIA QUERIES --- */
+
+    /* For screens narrower than 1300px: scale the container */
+    @media (max-width: 1300px) {
+      .container {
+        width: 90vw;        /* scale to 90% viewport width */
+        height: calc(90vw * 850 / 1200); /* maintain ratio ~ 1200:850 */
+      }
+      #flipbook {
+        width: 100%;
+        height: 100%;
+      }
+      .arrow {
+        width: 40px;
+        height: 40px;
+      }
+      .left-arrow {
+        left: -50px;
+      }
+      .right-arrow {
+        right: -50px;
+      }
+    }
+
+    /* For screens narrower than 768px: smaller arrow size, maybe smaller container, etc. */
+    @media (max-width: 768px) {
+      .container {
+        width: 95vw;
+        height: calc(95vw * 850 / 1200);
+      }
+      .arrow {
+        width: 36px;
+        height: 36px;
+      }
+      .left-arrow {
+        left: -40px;
+      }
+      .right-arrow {
+        right: -40px;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- UI Container to fade in everything at once -->
+  <!-- UI Container to fade in the link + container -->
   <div id="ui-container">
     <!-- BACK LINK -->
     <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
 
-    <!-- MAIN CONTAINER FOR FLIPBOOK & ARROWS -->
+    <!-- Flipbook + Arrows Container -->
     <div class="container">
-      <span class="arrow left-arrow">&#9664;</span>
+      <!-- Left Arrow (inline SVG) -->
+      <svg viewBox="0 0 24 24" class="arrow left-arrow">
+        <path d="M15.54 3.54a1 1 0 0 1 0 1.42L9.4 11.1l6.17 6.17a1 1 0 1 1-1.42 1.42l-7-7a1 1 0 0 1 0-1.42l7-7a1 1 0 0 1 1.42 0Z"/>
+      </svg>
+
+      <!-- Flipbook -->
       <div id="flipbook"></div>
-      <span class="arrow right-arrow">&#9654;</span>
+
+      <!-- Right Arrow (inline SVG) -->
+      <svg viewBox="0 0 24 24" class="arrow right-arrow">
+        <path d="M8.46 3.54a1 1 0 0 1 1.42 0l7 7a1 1 0 0 1 0 1.42l-7 7a1 1 0 1 1-1.42-1.42l6.17-6.17-6.17-6.17a1 1 0 0 1 0-1.42Z"/>
+      </svg>
     </div>
   </div>
 
   <script>
     $(document).ready(function() {
-      // 1) Show the entire UI after 0.5s (handled by #ui-container .show)
-      setTimeout(function(){
+      // 1) Fade in the UI after 0.5s
+      setTimeout(function() {
         document.getElementById('ui-container').classList.add('show');
       }, 500);
 
-      // 2) After the UI container is shown, we wait a bit more
-      //    then fade in the flipbook specifically
+      // 2) After UI container is visible, init the flipbook
       setTimeout(function(){
-        initFlipbook(); // Initialize Turn.js
-      }, 1500); // e.g., 1s after container starts to fade in
+        initFlipbook();
+      }, 1500); // e.g., 1 second after UI starts to fade in
     });
 
-    function initFlipbook(){
+    function initFlipbook() {
       if (typeof $.fn.turn === 'undefined') {
         console.error('Turn.js did not load.');
         return;
       }
-      var totalPages = 68; // or as many as you have
+
+      var totalPages = 68; // update if needed
       var $flipbook = $('#flipbook');
 
-      // Create pages
+      // Build pages
       for (var i = 1; i <= totalPages; i++) {
         $flipbook.append(`
           <div class="page">
@@ -177,7 +231,7 @@
         gradients: true
       });
 
-      // Now fade in the flipbook
+      // 3) Fade the flipbook in
       setTimeout(function(){
         $flipbook.addClass('show');
       }, 300);
