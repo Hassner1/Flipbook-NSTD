@@ -69,14 +69,16 @@
 
     /* FLIPBOOK CONTAINER */
     .container {
-      position: relative;
-      width: 1200px;  
-      height: 850px;  
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  position: relative;
+  width: 1200px;
+  height: 850px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Add this line */
+}
+
 
     /* The flipbook gets a fade-in after Turn.js init */
     #flipbook {
