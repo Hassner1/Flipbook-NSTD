@@ -14,6 +14,7 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            overflow: hidden;
         }
         #portfolio-link {
             display: block;
@@ -24,9 +25,16 @@
             color: #333;
             text-decoration: none;
         }
+        #flipbook-container {
+            position: relative;
+            width: 90vw; /* Makes the book take up most of the screen width */
+            max-width: 90vw;
+            height: calc(90vw * 297 / 420); /* Keeps A4 ratio (420:297) */
+            max-height: 90vh;
+        }
         #flipbook {
-            width: 420mm; /* Spread width (2x A4) */
-            height: 297mm; /* A4 height */
+            width: 100%;
+            height: 100%;
             position: relative;
         }
         #flipbook div {
@@ -60,11 +68,34 @@
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(5px); /* 5px blur */
         }
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 50px;
+            color: #57362b;
+            cursor: pointer;
+            z-index: 100;
+            opacity: 0.7;
+        }
+        .arrow:hover {
+            opacity: 1;
+        }
+        .left-arrow {
+            left: -60px;
+        }
+        .right-arrow {
+            right: -60px;
+        }
     </style>
 </head>
 <body>
     <a id="portfolio-link" href="https://mikeydoesart.ju.mp/" target="_blank">📂 View My Portfolio</a>
-    <div id="flipbook"></div>
+    <div id="flipbook-container">
+        <span class="arrow left-arrow">&#9664;</span>
+        <div id="flipbook"></div>
+        <span class="arrow right-arrow">&#9654;</span>
+    </div>
 
     <script>
         $(document).ready(function() {
@@ -110,37 +141,22 @@
                 }
 
                 flipbook.turn({
-                    width: 420,
-                    height: 297,
+                    width: flipbook.parent().width(),
+                    height: flipbook.parent().height(),
                     autoCenter: true,
                     display: 'double',
                     acceleration: true,
                     pages: totalPages
                 });
 
-                flipbook.on('click', function(event) {
-                    var bookWidth = $(this).width();
-                    var clickX = event.pageX - $(this).offset().left;
-
-                    if (clickX > bookWidth / 2) {
-                        flipbook.turn('next');
-                    } else {
-                        flipbook.turn('previous');
-                    }
+                $('.left-arrow').click(function() {
+                    flipbook.turn('previous');
                 });
 
-                $(document).on('touchstart', function(event) {
-                    var startX = event.originalEvent.touches[0].clientX;
-                    $(document).on('touchmove', function(event) {
-                        var moveX = event.originalEvent.touches[0].clientX;
-                        if (startX - moveX > 50) {
-                            flipbook.turn('next');
-                        } else if (moveX - startX > 50) {
-                            flipbook.turn('previous');
-                        }
-                        $(document).off('touchmove');
-                    });
+                $('.right-arrow').click(function() {
+                    flipbook.turn('next');
                 });
+
             }, 1000);
         });
     </script>
