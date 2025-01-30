@@ -184,6 +184,39 @@
       2) Screens below 768px (phones).
          Slightly smaller if you want, or keep 80vw.
     */
+  /* iPad / tablets in range 769px – 1024px */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .container {
+    /* Maybe 85% for iPad, so arrows have extra space. Adjust as needed. */
+    width: 85vw;
+    height: calc(85vw * 765 / 1080);
+  }
+  #flipbook {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Arrows smaller & less negative offset */
+  .arrow {
+    width: 50px;
+    height: 50px;
+  }
+  .left-arrow {
+    left: -40px; /* Instead of -55 or -70 */
+  }
+  .right-arrow {
+    right: -40px;
+  }
+
+  /* Home button smaller & more inwards */
+  .home-button {
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
     @media (max-width: 768px) {
       .container {
         width: 80vw; /* or 75vw if you want smaller on phones */
