@@ -38,6 +38,11 @@
     </div>
     <script>
         $(document).ready(function() {
+            if (typeof $.fn.turn === 'undefined') {
+                console.error("Turn.js did not load properly.");
+                return;
+            }
+            
             $('#flipbook').turn({
                 width: 800,
                 height: 500,
