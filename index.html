@@ -1,154 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Flipbook</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="turn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-color: #ffffff; /* Pure white background */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none; /* Prevents text/element selection */
-        }
-        #back-link {
-            display: block;
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #57362b;
-            text-decoration: none;
-            font-family: 'Antonio', sans-serif;
-            transition: color 0.75s ease;
-            user-select: none; /* Prevents selection */
-        }
-        #back-link:hover {
-            color: #8b5e48;
-        }
-        #flipbook-container {
-            position: relative;
-            width: 90vw;
-            max-width: 90vw;
-            height: auto;
-            max-height: 90vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        #flipbook {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 420 / 297; /* Keeps A4 ratio */
-            position: relative;
-            display: flex;
-        }
-        #flipbook div {
-            width: 50%; /* Each page takes half of the spread */
-            height: 100%;
-            position: relative;
-            display: flex;
-        }
-        #flipbook img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Ensures entire page is visible */
-        }
-        .blur-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(30px); /* Extreme blur to test visibility */
-            pointer-events: none; /* Prevents overlay from affecting interactions */
-        }
-        .arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 50px;
-            color: #57362b;
-            cursor: pointer;
-            z-index: 100;
-            opacity: 0.7;
-            transition: color 0.75s ease;
-            user-select: none; /* Prevents selection */
-        }
-        .arrow:hover {
-            color: #8b5e48;
-        }
-        .left-arrow {
-            left: -60px;
-        }
-        .right-arrow {
-            right: -60px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Flipbook</title>
+  <!-- jQuery & Turn.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4/turn.min.js"></script>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    /* --- BASIC PAGE STYLES --- */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff; /* Pure white */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      user-select: none; /* Prevents text selection */
+      overflow: hidden;  /* Hide scrollbars */
+      font-family: 'Antonio', sans-serif;
+    }
+
+    /* --- BACK LINK --- */
+    #back-link {
+      display: block;
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #57362b;
+      text-decoration: none;
+      transition: color 0.75s ease;
+    }
+    #back-link:hover {
+      color: #8b5e48;
+    }
+
+    /* --- FLIPBOOK CONTAINER --- */
+    #flipbook-container {
+      position: relative;
+      width: 90vw;    /* Takes up 90% of screen width */
+      max-width: 90vw;
+      height: 90vh;   /* Up to 90% of screen height */
+      max-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* We will place our flipbook inside here */
+    }
+
+    /* --- FLIPBOOK ITSELF --- */
+    #flipbook {
+      /* Start hidden for fade-in animation */
+      opacity: 0;
+      transition: opacity 1s ease-in-out; /* Smooth fade */
+      width: 100%;
+      height: 100%;
+    }
+    #flipbook.show {
+      /* When Turn.js is ready, we add .show to fade it in */
+      opacity: 1;
+    }
+
+    /* Each page is a simple DIV that Turn.js handles */
+    #flipbook .page {
+      width: 100%;
+      height: 100%;
+      position: relative; /* For the blur overlay */
+    }
+    #flipbook img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* --- BLUR OVERLAY --- */
+    .blur-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(30px);
+      pointer-events: none; /* Don’t block clicks */
+    }
+
+    .overlay-page {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* --- ARROWS --- */
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 50px;
+      color: #57362b;
+      cursor: pointer;
+      z-index: 100;
+      opacity: 0.7;
+      transition: color 0.75s ease;
+      user-select: none;
+    }
+    .arrow:hover {
+      color: #8b5e48;
+    }
+    .left-arrow {
+      left: 20px; /* Slightly inside the container */
+    }
+    .right-arrow {
+      right: 20px;
+    }
+  </style>
 </head>
 <body>
-    <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
-    <div id="flipbook-container">
-        <span class="arrow left-arrow">&#9664;</span>
-        <div id="flipbook"></div>
-        <span class="arrow right-arrow">&#9654;</span>
-    </div>
+  <!-- BACK LINK -->
+  <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
 
-    <script>
-        $(document).ready(function() {
-            setTimeout(function() {
-                if (typeof $.fn.turn === 'undefined') {
-                    console.error("Turn.js did not load properly.");
-                    return;
-                }
+  <!-- CONTAINER -->
+  <div id="flipbook-container">
+    <!-- NAV ARROWS -->
+    <span class="arrow left-arrow">&#9664;</span>
+    <div id="flipbook"></div>
+    <span class="arrow right-arrow">&#9654;</span>
+  </div>
 
-                var totalPages = 68; // Updated total pages
-                var flipbook = $('#flipbook');
-                var blurredPages = [14, 15, 16, 17, 18, 20, 21, 26, 39, 40, 41, 42, 43, 44, 64, 65];
+  <script>
+    $(document).ready(function() {
+      // Give the page a brief moment
+      setTimeout(function() {
+        // Check if Turn.js loaded
+        if (typeof $.fn.turn === 'undefined') {
+          console.error('Turn.js did not load properly.');
+          return;
+        }
 
-                for (var i = 1; i <= totalPages; i++) {
-                    var isCover = (i === 1 || i === totalPages);
-                    
-                    var pageContent = '<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>';
-                    
-                    if (blurredPages.includes(i)) {
-                        pageContent = '<div style="position:relative;">' +
-                                      '<img src="page' + i + '.jpg" alt="Page ' + i + '">' +
-                                      '<img src="overlay1.png" class="overlay-page" style="position:absolute; top:0; left:0; width:100%; height:100%;">' +
-                                      '<div class="blur-overlay"></div>' +
-                                      '</div>';
-                    }
-                    
-                    flipbook.append(pageContent);
-                }
+        /* -- Flipbook Setup -- */
+        var totalPages = 68; // You mentioned you now have 68 pages
+        var blurredPages = [14, 15, 16, 17, 18, 20, 21, 26, 39, 40, 41, 42, 43, 44, 64, 65];
+        var $flipbook = $('#flipbook');
 
-                flipbook.turn({
-                    width: flipbook.parent().width(),
-                    height: flipbook.parent().height(),
-                    autoCenter: true,
-                    display: 'double',
-                    acceleration: true,
-                    pages: totalPages
-                });
+        // Create each page
+        for (var i = 1; i <= totalPages; i++) {
+          var pageHTML = '<div class="page">';
+          // Normal image
+          pageHTML += '<img src="page' + i + '.jpg" alt="Page ' + i + '">';
 
-                $('.left-arrow').click(function() {
-                    flipbook.turn('previous');
-                });
+          // If page is in blurredPages, add overlay
+          if (blurredPages.includes(i)) {
+            pageHTML += '<img src="overlay1.png" class="overlay-page">';
+            pageHTML += '<div class="blur-overlay"></div>';
+          }
+          pageHTML += '</div>'; // close .page
 
-                $('.right-arrow').click(function() {
-                    flipbook.turn('next');
-                });
+          // Append the page to flipbook
+          $flipbook.append(pageHTML);
+        }
 
-            }, 1000);
+        // Initialize Turn.js
+        $flipbook.turn({
+          width: $('#flipbook-container').width(),   // match container width
+          height: $('#flipbook-container').height(), // match container height
+          autoCenter: true,
+          display: 'double',
+          pages: totalPages,
+          duration: 800, // page turn speed (ms)
+          acceleration: true
         });
-    </script>
+
+        // Fade the flipbook in
+        // We add a small delay so Turn.js has time to set up
+        setTimeout(function() {
+          $flipbook.addClass('show');
+        }, 300);
+
+        // Nav Arrows
+        $('.left-arrow').click(function() {
+          $flipbook.turn('previous');
+        });
+        $('.right-arrow').click(function() {
+          $flipbook.turn('next');
+        });
+      }, 500);
+    });
+  </script>
 </body>
 </html>
