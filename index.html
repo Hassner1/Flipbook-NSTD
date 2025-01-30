@@ -25,10 +25,9 @@
             text-decoration: none;
         }
         #flipbook {
-            width: 210mm; /* A4 width */
+            width: 420mm; /* Spread width (2x A4) */
             height: 297mm; /* A4 height */
             position: relative;
-            box-shadow: inset 0px 0px 20px #57362b;
         }
         #flipbook div {
             width: 100%;
@@ -39,6 +38,20 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        .left-page {
+            position: absolute;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.5), transparent);
+        }
+        .right-page {
+            position: absolute;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to left, rgba(87, 54, 43, 0.5), transparent);
         }
         .blur-overlay {
             position: absolute;
@@ -66,26 +79,43 @@
                 var blurredPages = [14, 15, 16, 17, 18, 20, 21, 26, 39, 40, 41, 42, 43, 44, 64, 65];
 
                 for (var i = 1; i <= totalPages; i++) {
+                    var isCover = (i === 1 || i === totalPages);
+                    var isLeftPage = (i % 2 === 0);
+                    
                     var pageContent = '<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>';
                     
-                    // If this page needs an overlay + blur effect
                     if (blurredPages.includes(i)) {
                         pageContent = '<div style="position:relative;">' +
                                       '<img src="page' + i + '.jpg" alt="Page ' + i + '">' +
-                                      '<img src="overlay' + i + '.png" class="overlay-page" style="position:absolute; top:0; left:0; width:100%; height:100%;">' +
+                                      '<img src="overlay1.png" class="overlay-page" style="position:absolute; top:0; left:0; width:100%; height:100%;">' +
                                       '<div class="blur-overlay"></div>' +
                                       '</div>';
+                    }
+                    
+                    if (!isCover) {
+                        if (isLeftPage) {
+                            pageContent = '<div style="position:relative;">' +
+                                          '<img src="page' + i + '.jpg" alt="Page ' + i + '">' +
+                                          '<div class="left-page"></div>' +
+                                          '</div>';
+                        } else {
+                            pageContent = '<div style="position:relative;">' +
+                                          '<img src="page' + i + '.jpg" alt="Page ' + i + '">' +
+                                          '<div class="right-page"></div>' +
+                                          '</div>';
+                        }
                     }
                     
                     flipbook.append(pageContent);
                 }
 
                 flipbook.turn({
-                    width: 210,
+                    width: 420,
                     height: 297,
                     autoCenter: true,
                     display: 'double',
-                    acceleration: true
+                    acceleration: true,
+                    pages: totalPages
                 });
 
                 flipbook.on('click', function(event) {
