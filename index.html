@@ -10,26 +10,47 @@
         body {
             background-color: #f0f0f0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
         }
+        #portfolio-link {
+            display: block;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
         #flipbook {
-            width: 800px;
-            height: 500px;
+            width: 210mm; /* A4 width */
+            height: 297mm; /* A4 height */
+            position: relative;
+            box-shadow: inset 0px 0px 20px #57362b;
         }
         #flipbook div {
             width: 100%;
             height: 100%;
+            position: relative;
         }
         #flipbook img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+        .blur-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px); /* 5px blur */
+        }
     </style>
 </head>
 <body>
+    <a id="portfolio-link" href="https://mikeydoesart.ju.mp/" target="_blank">📂 View My Portfolio</a>
     <div id="flipbook"></div>
 
     <script>
@@ -40,24 +61,33 @@
                     return;
                 }
 
-                var totalPages = 67; // Set total number of pages
+                var totalPages = 67;
                 var flipbook = $('#flipbook');
+                var blurredPages = [14, 15, 16, 17, 18, 20, 21, 26, 39, 40, 41, 42, 43, 44, 64, 65];
 
-                // First, create the pages inside the div
                 for (var i = 1; i <= totalPages; i++) {
-                    flipbook.append('<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>');
+                    var pageContent = '<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>';
+                    
+                    // If this page needs an overlay + blur effect
+                    if (blurredPages.includes(i)) {
+                        pageContent = '<div style="position:relative;">' +
+                                      '<img src="page' + i + '.jpg" alt="Page ' + i + '">' +
+                                      '<img src="overlay' + i + '.png" class="overlay-page" style="position:absolute; top:0; left:0; width:100%; height:100%;">' +
+                                      '<div class="blur-overlay"></div>' +
+                                      '</div>';
+                    }
+                    
+                    flipbook.append(pageContent);
                 }
 
-                // Now initialize the flipbook
                 flipbook.turn({
-                    width: 800,
-                    height: 500,
+                    width: 210,
+                    height: 297,
                     autoCenter: true,
                     display: 'double',
                     acceleration: true
                 });
 
-                // Click to turn pages
                 flipbook.on('click', function(event) {
                     var bookWidth = $(this).width();
                     var clickX = event.pageX - $(this).offset().left;
@@ -69,7 +99,6 @@
                     }
                 });
 
-                // Swipe support for mobile
                 $(document).on('touchstart', function(event) {
                     var startX = event.originalEvent.touches[0].clientX;
                     $(document).on('touchmove', function(event) {
@@ -82,7 +111,6 @@
                         $(document).off('touchmove');
                     });
                 });
-
             }, 1000);
         });
     </script>
