@@ -26,17 +26,17 @@
       align-items: center;
       justify-content: flex-start;
       height: 100vh;
-      user-select: none;
+      user-select: none; /* No text selection */
       overflow: hidden;
       font-family: 'Antonio', sans-serif;
       position: relative;
     }
 
-    /* UI CONTAINER */
+    /* UI CONTAINER (Flipbook + Arrows) */
     #ui-container {
       opacity: 0;  
-      /* 1s fade-in, starting after 0.5s delay => total 1.5s until visible */
-      transition: opacity 1s ease 0.5s; 
+      /* Fade in the entire UI after 0.5s delay, lasting 1s => fully visible by 1.5s */
+      transition: opacity 1s ease 0.5s;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -53,7 +53,7 @@
     /* FLIPBOOK CONTAINER */
     .container {
       position: relative;
-      width: 1080px;
+      width: 1080px;   /* A4-ish ratio at 1080×765 */
       height: 765px;
       background: #ffffff;
       display: flex;
@@ -67,8 +67,8 @@
       height: 765px;
       background: #ffffff;
       opacity: 0;      
-      /* 1s fade, triggered after a 2s delay in JS => 3s total */
-      transition: opacity 1s ease; 
+      /* Will fade in over 1s after we trigger it in JS */
+      transition: opacity 1s ease;
       z-index: 1;
     }
     #flipbook.show {
@@ -92,19 +92,19 @@
     .home-button {
       position: absolute;
       top: 20px;
-      right: 20px; 
-      z-index: 999; 
+      right: 20px;
+      z-index: 999;
       width: 50px;
       height: 50px;
       cursor: pointer;
       opacity: 0.8;
-      /* Hover animation: 0.5s */
-      transition: stroke 0.5s ease; 
+      /* Hover animation: 1s for color change */
+      transition: stroke 1s ease;
       user-select: none;
     }
     .home-button path {
       stroke: #57362b;
-      stroke-width: 3.5; 
+      stroke-width: 3.5;
       fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -120,22 +120,22 @@
       transform: translateY(-50%);
       cursor: pointer;
       z-index: 2;
-      opacity: 0;  /* start fully transparent, we’ll fade them in after flipbook */
-      /* hover animation 0.5s, plus fade for opacity */
-      transition: stroke 0.5s ease, opacity 1s ease; 
+      opacity: 0; /* start invisible, we show them after flipbook fades in */
+      /* 1s hover color change, 1s fade for opacity */
+      transition: stroke 1s ease, opacity 1s ease;
       user-select: none;
       width: 60px;
       height: 60px;
     }
     .arrow path {
       stroke: #57362b;
-      stroke-width: 3.5; 
+      stroke-width: 3.5;
       fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
     .arrow:hover path {
-      stroke: #8b5e48;
+      stroke: #8b5e48; /* 1s color change */
     }
     .left-arrow {
       left: -70px;
@@ -161,9 +161,9 @@
       .left-arrow { left: -55px; }
       .right-arrow { right: -55px; }
       .home-button {
-        width: 40px; 
+        width: 40px;
         height: 40px;
-        top: 15px; 
+        top: 15px;
         right: 15px;
       }
     }
@@ -179,16 +179,16 @@
       .left-arrow { left: -45px; }
       .right-arrow { right: -45px; }
       .home-button {
-        width: 35px; 
+        width: 35px;
         height: 35px;
-        top: 10px; 
+        top: 10px;
         right: 10px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- UI Container -->
+  <!-- UI Container (flipbook + arrows) -->
   <div id="ui-container">
     <!-- HOME BUTTON (Top Right) -->
     <svg class="home-button" viewBox="0 0 24 24"
@@ -219,15 +219,15 @@
     }, false);
 
     $(document).ready(function() {
-      // 1) Start UI fade after page load
+      // 1) Fade in the UI container
       setTimeout(function() {
         document.getElementById('ui-container').classList.add('show');
-      }, 500);
+      }, 500); // 0.5s after load => start 1s fade
 
-      // 2) Initialize flipbook after UI is fully visible + extra delay
+      // 2) Initialize flipbook after UI is visible + small buffer
       setTimeout(function() {
         initFlipbook();
-      }, 2000);
+      }, 2000); // by 2s, UI container done => load flipbook
     });
 
     function initFlipbook() {
@@ -236,7 +236,7 @@
         return;
       }
 
-      var totalPages = 68; 
+      var totalPages = 68;
       var $flipbook = $('#flipbook');
 
       // Create pages
@@ -255,9 +255,9 @@
         autoCenter: true,
         display: 'double',
         pages: totalPages,
-        duration: 1000,
+        duration: 1000,   // 1s flip
         acceleration: true,
-        gradients: false,
+        gradients: false, // no shadows
         when: {
           turned: function(e, page) {
             // Hide left arrow on first page
@@ -278,10 +278,10 @@
 
       // 3) Fade the flipbook in
       setTimeout(function(){
-        $flipbook.addClass('show');
+        $flipbook.addClass('show'); // triggers 1s fade
       }, 300);
 
-      // 4) Show arrows after flipbook is visible
+      // 4) Show arrows after flipbook is fully in
       setTimeout(function() {
         // If not on page 1 => show left arrow
         if ($flipbook.turn('page') !== 1) {
@@ -291,10 +291,10 @@
         if ($flipbook.turn('page') !== totalPages) {
           $('.right-arrow').css('opacity', 1);
         }
-      }, 2000);
+      }, 2000); // 2s after we fade in the flipbook
     }
 
-    // Arrow Navigation
+    // ARROW Navigation
     $(document).on('click', '.left-arrow', function() {
       $('#flipbook').turn('previous');
     });
