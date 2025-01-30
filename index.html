@@ -6,7 +6,7 @@
   <title>Interactive Flipbook</title>
   <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="turn.min.js"></script> <!-- Or your local copy -->
+  <script src="turn.min.js"></script> <!-- Or your local Turn.js if CDN is blocked -->
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet" />
@@ -60,36 +60,35 @@
       /* Start hidden for fade-in animation */
       opacity: 0;
       transition: opacity 1s ease-in-out 0.25s;
-      
+
       /* 85% of container so arrows aren’t obscured */
       width: 85%;
       height: 85%;
       max-width: 85%;
       max-height: 85%;
 
-      /* Keep A4 ratio if browser supports aspect-ratio */
+      /* Keep A4 ratio if the browser supports aspect-ratio */
       aspect-ratio: 420 / 297;
 
       position: relative;
     }
     #flipbook.show {
-      opacity: 1;
+      opacity: 1; /* Fade in */
     }
 
-    /* Each page DIV is handled by Turn.js */
+    /* Each page is handled by Turn.js */
     #flipbook .page {
       width: 100%;
       height: 100%;
       position: relative;
-      /* Tiny negative margin to reduce gap between pages */
-      margin: 0 -5px; 
+      /* Small negative margin to reduce center gap */
+      margin: 0 -2px; 
     }
 
-    /* If not blurred, normal page. If blurred, we add a style inline. */
     #flipbook img {
       width: 100%;
       height: 100%;
-      object-fit: contain; 
+      object-fit: contain;
       object-position: center;
     }
 
@@ -101,7 +100,7 @@
       font-size: 50px;
       color: #57362b;
       cursor: pointer;
-      z-index: 100;
+      z-index: 100; /* Above flipbook */
       opacity: 0.7;
       transition: color 0.75s ease;
       user-select: none;
@@ -118,9 +117,12 @@
   </style>
 </head>
 <body>
+  <!-- BACK LINK -->
   <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
 
+  <!-- CONTAINER -->
   <div id="flipbook-container">
+    <!-- NAV ARROWS -->
     <span class="arrow left-arrow">&#9664;</span>
     <div id="flipbook"></div>
     <span class="arrow right-arrow">&#9654;</span>
@@ -134,44 +136,41 @@
           return;
         }
 
-        // Updated to 68 pages
         var totalPages = 68;
-        // Pages you want blurred at 1px
         var blurredPages = [14, 15, 16, 17, 18, 20, 21, 26, 39, 40, 41, 42, 43, 44, 64, 65];
         var $flipbook = $('#flipbook');
 
+        // Build pages
         for (var i = 1; i <= totalPages; i++) {
-          // Build the page markup
-          let extraStyle = '';
-          if (blurredPages.includes(i)) {
-            // Add inline blur to the img
-            extraStyle = 'style="filter: blur(1px);"';
-          }
+          // If the page needs blur, apply inline style
+          var blurStyle = blurredPages.includes(i) ? 'style="filter: blur(0.5px);"' : '';
           var pageHTML = `
             <div class="page">
-              <img src="page${i}.jpg" alt="Page ${i}" ${extraStyle}>
+              <img src="page${i}.jpg" alt="Page ${i}" ${blurStyle}>
             </div>
           `;
           $flipbook.append(pageHTML);
         }
 
-        // Initialize Turn.js
+        // Initialize Turn.js with smooth settings
         $flipbook.turn({
           width: $flipbook.width(),
           height: $flipbook.height(),
           autoCenter: true,
           display: 'double',
           pages: totalPages,
-          duration: 800,
-          acceleration: true
+          duration: 1200,   // slower, smoother flip
+          acceleration: true,
+          gradients: false, // disable page-curve gradients
+          elevation: 50     // 'height' of turning page
         });
 
-        // Fade the flipbook in
+        // Fade in flipbook
         setTimeout(function() {
           $flipbook.addClass('show');
         }, 300);
 
-        // Arrow Navigation
+        // Arrows
         $('.left-arrow').click(function() {
           $flipbook.turn('previous');
         });
