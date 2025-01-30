@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Responsive Turn.js Flipbook</title>
+  <title>Mikey Does Art - NSTD Flipbook</title>
   <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="turn.min.js"></script> <!-- Or your local Turn.js if CDN is blocked -->
@@ -29,11 +29,12 @@
       user-select: none;
       overflow: hidden;
       font-family: 'Antonio', sans-serif;
+      position: relative; /* So absolutely-positioned link stays within body */
     }
 
-    /* UI CONTAINER (Link + Flipbook Container) */
+    /* UI CONTAINER (for the flipbook + arrows) */
     #ui-container {
-      opacity: 0; /* Hidden until fade-in */
+      opacity: 0;                  /* Hidden until fade-in */
       transition: opacity 1s ease 0.5s; /* Fade in over 1s after 0.5s delay */
       display: flex;
       flex-direction: column;
@@ -41,6 +42,8 @@
       justify-content: center;
       width: 100%;
       height: 100%;
+      position: relative; /* For arrow placement, etc. */
+      z-index: 1;         /* Keep container above base background */
     }
     #ui-container.show {
       opacity: 1;
@@ -48,15 +51,17 @@
 
     /* BACK LINK */
     #back-link {
-      display: block;
-      text-align: center;
-      margin: 15px auto;
+      position: absolute;
+      top: 10px; 
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 24px;
       font-weight: bold;
       color: #57362b;
       text-decoration: none;
       transition: color 0.75s ease;
       user-select: none;
+      z-index: 999;  /* Always above flipbook */
     }
     #back-link:hover {
       color: #8b5e48;
@@ -65,8 +70,8 @@
     /* FLIPBOOK CONTAINER */
     .container {
       position: relative;
-      width: 1200px;  /* Desktop size */
-      height: 850px;  /* Desktop size */
+      width: 1200px;  
+      height: 850px;  
       background: #ffffff;
       display: flex;
       align-items: center;
@@ -78,8 +83,9 @@
       width: 1200px;
       height: 850px;
       background: #ffffff;
-      opacity: 0;
-      transition: opacity 1s ease; /* fade time (no delay here, we trigger it in JS) */
+      opacity: 0;            /* start hidden */
+      transition: opacity 1s ease; 
+      z-index: 1;            /* below the BACK link, but above background */
     }
     #flipbook.show {
       opacity: 1;
@@ -98,28 +104,36 @@
       background: #ffffff;
     }
 
-    /* ARROWS */
+    /* ARROW STYLES */
     .arrow {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       cursor: pointer;
-      z-index: 100;
+      z-index: 2;    /* Above flipbook (#flipbook has z-index:1) */
       opacity: 0.7;
-      transition: color 0.75s ease;
+      transition: fill 0.75s ease;  /* We'll use stroke/fill for thicker arrows */
       user-select: none;
-      width: 50px;         /* SVG container width */
-      height: 50px;        /* SVG container height */
-      fill: #57362b;       /* Arrow color */
+      width: 60px;
+      height: 60px;
     }
-    .arrow:hover {
-      fill: #8b5e48;       /* On hover, arrow changes color */
+    /* THICKER ARROWS: We'll rely on stroke to define thickness */
+    .arrow path {
+      stroke: #57362b;
+      stroke-width: 3.5; 
+      fill: none; /* You can set fill if you prefer a solid arrow, but thick stroke looks chunkier */
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
+    .arrow:hover path {
+      stroke: #8b5e48;
+    }
+
     .left-arrow {
-      left: -60px;
+      left: -70px; /* Shift arrow further to the left */
     }
     .right-arrow {
-      right: -60px;
+      right: -70px;
     }
 
     /* --- RESPONSIVE MEDIA QUERIES --- */
@@ -127,7 +141,7 @@
     /* For screens narrower than 1300px: scale the container */
     @media (max-width: 1300px) {
       .container {
-        width: 90vw;        /* scale to 90% viewport width */
+        width: 90vw;
         height: calc(90vw * 850 / 1200); /* maintain ratio ~ 1200:850 */
       }
       #flipbook {
@@ -135,55 +149,54 @@
         height: 100%;
       }
       .arrow {
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
       }
       .left-arrow {
-        left: -50px;
+        left: -55px;
       }
       .right-arrow {
-        right: -50px;
+        right: -55px;
       }
     }
 
-    /* For screens narrower than 768px: smaller arrow size, maybe smaller container, etc. */
+    /* For screens narrower than 768px: smaller arrow size, etc. */
     @media (max-width: 768px) {
       .container {
         width: 95vw;
         height: calc(95vw * 850 / 1200);
       }
       .arrow {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
       }
       .left-arrow {
-        left: -40px;
+        left: -45px;
       }
       .right-arrow {
-        right: -40px;
+        right: -45px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- UI Container to fade in the link + container -->
+  <!-- UI Container (flipbook + arrows) -->
   <div id="ui-container">
-    <!-- BACK LINK -->
+    <!-- BACK LINK (on top with z-index:999) -->
     <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
 
-    <!-- Flipbook + Arrows Container -->
+    <!-- FLIPBOOK CONTAINER -->
     <div class="container">
-      <!-- Left Arrow (inline SVG) -->
-      <svg viewBox="0 0 24 24" class="arrow left-arrow">
-        <path d="M15.54 3.54a1 1 0 0 1 0 1.42L9.4 11.1l6.17 6.17a1 1 0 1 1-1.42 1.42l-7-7a1 1 0 0 1 0-1.42l7-7a1 1 0 0 1 1.42 0Z"/>
+      <!-- Left Arrow (Thicker stroke) -->
+      <svg class="arrow left-arrow" viewBox="0 0 24 24">
+        <path d="M15 4 L8 12 L15 20" />
       </svg>
 
-      <!-- Flipbook -->
       <div id="flipbook"></div>
 
-      <!-- Right Arrow (inline SVG) -->
-      <svg viewBox="0 0 24 24" class="arrow right-arrow">
-        <path d="M8.46 3.54a1 1 0 0 1 1.42 0l7 7a1 1 0 0 1 0 1.42l-7 7a1 1 0 1 1-1.42-1.42l6.17-6.17-6.17-6.17a1 1 0 0 1 0-1.42Z"/>
+      <!-- Right Arrow (Thicker stroke) -->
+      <svg class="arrow right-arrow" viewBox="0 0 24 24">
+        <path d="M9 4 L16 12 L9 20" />
       </svg>
     </div>
   </div>
@@ -198,7 +211,7 @@
       // 2) After UI container is visible, init the flipbook
       setTimeout(function(){
         initFlipbook();
-      }, 1500); // e.g., 1 second after UI starts to fade in
+      }, 1500);
     });
 
     function initFlipbook() {
@@ -231,7 +244,7 @@
         gradients: true
       });
 
-      // 3) Fade the flipbook in
+      // 3) Fade the flipbook in after slight delay
       setTimeout(function(){
         $flipbook.addClass('show');
       }, 300);
