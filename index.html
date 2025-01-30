@@ -12,24 +12,37 @@
 
   <style>
     /* RESET */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
 
-    /* BASIC PAGE STYLES */
+    /* BODY */
     body {
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100vh;
-  user-select: none;
-  overflow: hidden;
-  font-family: 'Antonio', sans-serif;
-  /* REMOVE these:
-  transform: scale(0.9);
-  transform-origin: 0 0;
-  */
-}
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      user-select: none;
+      overflow: hidden;
+      font-family: 'Antonio', sans-serif;
+    }
+
+    /* UI CONTAINER (Link + Flipbook Container) */
+    #ui-container {
+      /* Start invisible for fade-in */
+      opacity: 0;
+      transition: opacity 1s ease 0.5s; /* Fade in over 1s, starts after 0.5s delay */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Once we add .show, it will fade in */
+    #ui-container.show {
+      opacity: 1;
+    }
 
     /* BACK LINK */
     #back-link {
@@ -47,36 +60,34 @@
       color: #8b5e48;
     }
 
-    /* CONTAINER */
+    /* FLIPBOOK CONTAINER */
     .container {
+      position: relative;
+      width: 1200px;
+      height: 850px;
+      background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;  /* For arrow positioning */
-      margin: 0 auto;
-      /* Fixed dimension container so Turn.js is stable */
-      width: 1080px;
-      height: 765px;
-      background: #ffffff; /* White container background too */
     }
 
     /* FLIPBOOK */
     #flipbook {
-      width: 1080px;
-      height: 765px;
-      background: #ffffff; /* White so there's no gray fill */
-      opacity: 0;          /* For fade-in */
-      transition: opacity 1s ease-in-out 0.25s;
+      width: 1200px;
+      height: 850px;
+      background: #ffffff;
+      opacity: 0; /* For second fade-in */
+      transition: opacity 1s ease; /* We'll trigger this AFTER the UI container appears */
     }
     #flipbook.show {
       opacity: 1;
     }
 
-    /* Turn.js pages */
+    /* PAGES */
     #flipbook .page {
       width: 100%;
       height: 100%;
-      background: #ffffff; /* Each page is also white behind the image */
+      background: #ffffff;
     }
     #flipbook img {
       width: 100%;
@@ -85,7 +96,7 @@
       background: #ffffff;
     }
 
-    /* ARROWS on the sides, vertically centered */
+    /* ARROWS */
     .arrow {
       position: absolute;
       top: 50%;
@@ -102,71 +113,82 @@
       color: #8b5e48;
     }
     .left-arrow {
-      left: -60px;  /* shift arrow to the left side */
+      left: -60px;
     }
     .right-arrow {
-      right: -60px; /* shift arrow to the right side */
+      right: -60px;
     }
   </style>
 </head>
 <body>
-  <!-- BACK LINK -->
-  <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
+  <!-- UI Container to fade in everything at once -->
+  <div id="ui-container">
+    <!-- BACK LINK -->
+    <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
 
-  <!-- MAIN CONTAINER FOR FLIPBOOK & ARROWS -->
-  <div class="container">
-    <!-- Arrows on the sides, same horizontal line as flipbook -->
-    <span class="arrow left-arrow">&#9664;</span>
-    <div id="flipbook"></div>
-    <span class="arrow right-arrow">&#9654;</span>
+    <!-- MAIN CONTAINER FOR FLIPBOOK & ARROWS -->
+    <div class="container">
+      <span class="arrow left-arrow">&#9664;</span>
+      <div id="flipbook"></div>
+      <span class="arrow right-arrow">&#9654;</span>
+    </div>
   </div>
 
   <script>
-    $(document).ready(function(){
-      // Short delay
+    $(document).ready(function() {
+      // 1) Show the entire UI after 0.5s (handled by #ui-container .show)
       setTimeout(function(){
-        if (typeof $.fn.turn === 'undefined') {
-          console.error('Turn.js did not load.');
-          return;
-        }
-
-        var totalPages = 68; // or however many pages
-        var $flipbook = $('#flipbook');
-
-        // Create pages
-        for (var i = 1; i <= totalPages; i++) {
-          $flipbook.append(`
-            <div class="page">
-              <img src="page${i}.jpg" alt="Page ${i}">
-            </div>
-          `);
-        }
-
-        // Init Turn.js
-        $flipbook.turn({
-          width: 1080,
-          height: 765,
-          autoCenter: true,
-          display: 'double',
-          pages: totalPages,
-          duration: 1000,   // 1s page flip
-          acceleration: true,
-          gradients: true
-        });
-
-        // Fade the flipbook in
-        setTimeout(function(){
-          $flipbook.addClass('show');
-        }, 300);
-
-        // Arrows
-        $('.left-arrow').on('click', function() {
-          $flipbook.turn('previous');
-        });
-        $('.right-arrow').on('click', function() {
-          $flipbook.turn('next');
-        });
+        document.getElementById('ui-container').classList.add('show');
       }, 500);
+
+      // 2) After the UI container is shown, we wait a bit more
+      //    then fade in the flipbook specifically
+      setTimeout(function(){
+        initFlipbook(); // Initialize Turn.js
+      }, 1500); // e.g., 1s after container starts to fade in
+    });
+
+    function initFlipbook(){
+      if (typeof $.fn.turn === 'undefined') {
+        console.error('Turn.js did not load.');
+        return;
+      }
+      var totalPages = 68; // or as many as you have
+      var $flipbook = $('#flipbook');
+
+      // Create pages
+      for (var i = 1; i <= totalPages; i++) {
+        $flipbook.append(`
+          <div class="page">
+            <img src="page${i}.jpg" alt="Page ${i}">
+          </div>
+        `);
+      }
+
+      // Initialize Turn.js
+      $flipbook.turn({
+        width: 1200,
+        height: 850,
+        autoCenter: true,
+        display: 'double',
+        pages: totalPages,
+        duration: 1000,
+        acceleration: true,
+        gradients: true
+      });
+
+      // Now fade in the flipbook
+      setTimeout(function(){
+        $flipbook.addClass('show');
+      }, 300);
+    }
+
+    // ARROW Navigation
+    $(document).on('click', '.left-arrow', function() {
+      $('#flipbook').turn('previous');
+    });
+    $(document).on('click', '.right-arrow', function() {
+      $('#flipbook').turn('next');
     });
   </script>
 </body>
