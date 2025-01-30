@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Responsive Turn.js Flipbook</title>
+  <title>Mikey Does Art: NSTD Flipbook</title>
   <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="turn.min.js"></script> <!-- Or your local Turn.js if CDN is blocked -->
@@ -34,7 +34,7 @@
 
     /* UI CONTAINER (for the flipbook + arrows) */
     #ui-container {
-      opacity: 0;                  /* Hidden until fade-in */
+      opacity: 0; /* Hidden until fade-in */
       transition: opacity 1s ease 0.5s; /* Fade in over 1s after 0.5s delay */
       display: flex;
       flex-direction: column;
@@ -49,35 +49,15 @@
       opacity: 1;
     }
 
-    /* BACK LINK */
-    #back-link {
-      position: absolute;
-      /* Increased top for more spacing */
-      top: 40px; 
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 24px;
-      font-weight: bold;
-      color: #57362b;
-      text-decoration: none;
-      transition: color 0.75s ease;
-      user-select: none;
-      z-index: 999;  
-    }
-    #back-link:hover {
-      color: #8b5e48;
-    }
-
     /* FLIPBOOK CONTAINER */
     .container {
       position: relative;
-      width: 1200px;  
-      height: 850px;  
+      width: 1200px;
+      height: 850px;
       background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      /* Removed overflow: hidden; so arrows won't clip */
     }
 
     /* The flipbook gets a fade-in after Turn.js init */
@@ -87,7 +67,7 @@
       background: #ffffff;
       opacity: 0;            
       transition: opacity 1s ease; 
-      z-index: 1;            
+      z-index: 1;
     }
     #flipbook.show {
       opacity: 1;
@@ -112,9 +92,9 @@
       top: 50%;
       transform: translateY(-50%);
       cursor: pointer;
-      z-index: 2;    
+      z-index: 2;
       opacity: 0.7;
-      transition: fill 0.75s ease;  
+      transition: stroke 0.75s ease;
       user-select: none;
       width: 60px;
       height: 60px;
@@ -122,19 +102,42 @@
     .arrow path {
       stroke: #57362b;
       stroke-width: 3.5; 
-      fill: none; 
+      fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
     .arrow:hover path {
       stroke: #8b5e48;
     }
-
     .left-arrow {
-      left: -70px; 
+      left: -70px;
     }
     .right-arrow {
       right: -70px;
+    }
+
+    /* HOME BUTTON (top-left corner) */
+    .home-button {
+      position: absolute;
+      top: 20px;    /* Adjust vertical spacing as needed */
+      left: 20px;   /* Place near the left edge */
+      z-index: 999; /* Always above flipbook */
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: stroke 0.75s ease;
+      user-select: none;
+    }
+    .home-button path {
+      stroke: #57362b;
+      stroke-width: 3.5; 
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .home-button:hover path {
+      stroke: #8b5e48;
     }
 
     /* --- RESPONSIVE MEDIA QUERIES --- */
@@ -152,11 +155,13 @@
         width: 50px;
         height: 50px;
       }
-      .left-arrow {
-        left: -55px;
-      }
-      .right-arrow {
-        right: -55px;
+      .left-arrow { left: -55px; }
+      .right-arrow { right: -55px; }
+      .home-button {
+        width: 40px; 
+        height: 40px;
+        top: 15px;
+        left: 15px;
       }
     }
 
@@ -169,32 +174,37 @@
         width: 40px;
         height: 40px;
       }
-      .left-arrow {
-        left: -45px;
+      .left-arrow { left: -45px; }
+      .right-arrow { right: -45px; }
+      .home-button {
+        width: 35px; 
+        height: 35px;
+        top: 10px;
+        left: 10px;
       }
-      .right-arrow {
-        right: -45px;
-      }
-      /* You can also adjust #back-link top if needed on mobile */
     }
   </style>
 </head>
 <body>
   <!-- UI Container (flipbook + arrows) -->
   <div id="ui-container">
-    <!-- BACK LINK with extra top margin -->
-    <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
+    <!-- HOME BUTTON (house icon), top-left corner -->
+    <svg class="home-button" viewBox="0 0 24 24"
+         onclick="window.open('https://mikeydoesart.ju.mp/', '_blank')">
+      <!-- A simple house path. Adjust stroke-width above for thickness. -->
+      <path d="M3 9.5 L12 3 L21 9.5 V21 H3 Z" />
+    </svg>
 
-    <!-- FLIPBOOK CONTAINER -->
     <div class="container">
-      <!-- Left Arrow (Thicker stroke) -->
+      <!-- LEFT ARROW -->
       <svg class="arrow left-arrow" viewBox="0 0 24 24">
         <path d="M15 4 L8 12 L15 20" />
       </svg>
 
+      <!-- FLIPBOOK -->
       <div id="flipbook"></div>
 
-      <!-- Right Arrow (Thicker stroke) -->
+      <!-- RIGHT ARROW -->
       <svg class="arrow right-arrow" viewBox="0 0 24 24">
         <path d="M9 4 L16 12 L9 20" />
       </svg>
@@ -223,7 +233,7 @@
       var totalPages = 68; 
       var $flipbook = $('#flipbook');
 
-      // Build pages
+      // Create pages
       for (var i = 1; i <= totalPages; i++) {
         $flipbook.append(`
           <div class="page">
@@ -232,7 +242,7 @@
         `);
       }
 
-      // Initialize Turn.js with gradients: false if you prefer
+      // Initialize Turn.js with no gradients
       $flipbook.turn({
         width: 1200,
         height: 850,
@@ -241,7 +251,24 @@
         pages: totalPages,
         duration: 1000,
         acceleration: true,
-        gradients: false  /* Disabled shadows for your preference */
+        gradients: false,
+        when: {
+          turned: function(e, page) {
+            // Hide left arrow if on first page
+            if (page === 1) {
+              $('.left-arrow').hide();
+            } else {
+              $('.left-arrow').show();
+            }
+
+            // Hide right arrow if on last page
+            if (page === totalPages) {
+              $('.right-arrow').hide();
+            } else {
+              $('.right-arrow').show();
+            }
+          }
+        }
       });
 
       // Fade the flipbook in
