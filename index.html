@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>Simple Turn.js Flipbook</title>
-  <!-- jQuery & Turn.js (local or CDN) -->
+  <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="turn.min.js"></script> <!-- Use local if CDN is blocked -->
+  <script src="turn.min.js"></script> <!-- Or your local Turn.js if CDN is blocked -->
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet" />
@@ -16,22 +16,24 @@
 
     /* BASIC PAGE STYLES */
     body {
-      background-color: #ffffff;
+      background-color: #ffffff;  /* White background */
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start; /* We'll center flipbook below */
       height: 100vh;
       user-select: none;
       overflow: hidden;
       font-family: 'Antonio', sans-serif;
+      transform: scale(0.9); /* Scale entire site to 90% */
+      transform-origin: 0 0; /* So it scales from top-left corner */
     }
 
     /* BACK LINK */
     #back-link {
       display: block;
       text-align: center;
-      margin-bottom: 15px;
+      margin: 15px auto;  /* space above flipbook */
       font-size: 24px;
       font-weight: bold;
       color: #57362b;
@@ -46,26 +48,25 @@
     /* CONTAINER */
     .container {
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      position: relative;  /* For arrows positioning */
+      position: relative;  /* For arrow positioning */
+      margin: 0 auto;
+      /* Fixed dimension container so Turn.js is stable */
+      width: 1200px;
+      height: 850px;
+      background: #ffffff; /* White container background too */
     }
 
     /* FLIPBOOK */
     #flipbook {
-      /* Fixed size for stable Turn.js layout */
       width: 1200px;
       height: 850px;
-      margin: 0 auto;   /* Center horizontally if needed */
-      background: #ccc; /* Just for reference - remove if you want */
-
-      /* Fade-in effect */
-      opacity: 0;
-      transition: opacity 1s ease-in-out 0.25s; /* 1s fade, starts after 0.25s */
+      background: #ffffff; /* White so there's no gray fill */
+      opacity: 0;          /* For fade-in */
+      transition: opacity 1s ease-in-out 0.25s;
     }
     #flipbook.show {
-      /* Class added once Turn.js is ready, triggers fade-in */
       opacity: 1;
     }
 
@@ -73,21 +74,16 @@
     #flipbook .page {
       width: 100%;
       height: 100%;
+      background: #ffffff; /* Each page is also white behind the image */
     }
     #flipbook img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      background: #fff; /* So the page is white behind the image */
+      background: #ffffff;
     }
 
-    /* ARROWS */
-    .arrows-container {
-      position: relative;
-      width: 1200px;  /* match flipbook width */
-      margin: 0 auto;
-      text-align: center;
-    }
+    /* ARROWS on the sides, vertically centered */
     .arrow {
       position: absolute;
       top: 50%;
@@ -104,10 +100,10 @@
       color: #8b5e48;
     }
     .left-arrow {
-      left: -60px;   /* shift arrow to the left side */
+      left: -60px;  /* shift arrow to the left side */
     }
     .right-arrow {
-      right: -60px;  /* shift arrow to the right side */
+      right: -60px; /* shift arrow to the right side */
     }
   </style>
 </head>
@@ -115,28 +111,24 @@
   <!-- BACK LINK -->
   <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
 
-  <!-- MAIN CONTAINER -->
+  <!-- MAIN CONTAINER FOR FLIPBOOK & ARROWS -->
   <div class="container">
-    <!-- ARROWS -->
-    <div class="arrows-container">
-      <span class="arrow left-arrow">&#9664;</span>
-      <span class="arrow right-arrow">&#9654;</span>
-    </div>
-
-    <!-- FLIPBOOK -->
+    <!-- Arrows on the sides, same horizontal line as flipbook -->
+    <span class="arrow left-arrow">&#9664;</span>
     <div id="flipbook"></div>
+    <span class="arrow right-arrow">&#9654;</span>
   </div>
 
   <script>
     $(document).ready(function(){
-      // Brief delay to let page load
+      // Short delay
       setTimeout(function(){
         if (typeof $.fn.turn === 'undefined') {
           console.error('Turn.js did not load.');
           return;
         }
 
-        var totalPages = 68; // adjust as needed
+        var totalPages = 68; // or however many pages
         var $flipbook = $('#flipbook');
 
         // Create pages
@@ -155,7 +147,7 @@
           autoCenter: true,
           display: 'double',
           pages: totalPages,
-          duration: 1000,
+          duration: 1000,   // 1s page flip
           acceleration: true,
           gradients: true
         });
@@ -165,7 +157,7 @@
           $flipbook.addClass('show');
         }, 300);
 
-        // Arrow Navigation
+        // Arrows
         $('.left-arrow').on('click', function() {
           $flipbook.turn('previous');
         });
