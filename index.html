@@ -38,16 +38,46 @@
     </div>
     <script>
         $(document).ready(function() {
-            if (typeof $.fn.turn === 'undefined') {
-                console.error("Turn.js did not load properly.");
-                return;
-            }
-            
-            $('#flipbook').turn({
-                width: 800,
-                height: 500,
-                autoCenter: true
-            });
+            setTimeout(function() {
+                if (typeof $.fn.turn === 'undefined') {
+                    console.error("Turn.js did not load properly.");
+                    return;
+                }
+
+                $('#flipbook').turn({
+                    width: 800,
+                    height: 500,
+                    autoCenter: true,
+                    display: 'double',
+                    acceleration: true
+                });
+
+                // Click right side to go forward, left side to go back
+                $('#flipbook').on('click', function(event) {
+                    var bookWidth = $(this).width();
+                    var clickX = event.pageX - $(this).offset().left;
+
+                    if (clickX > bookWidth / 2) {
+                        $('#flipbook').turn('next');
+                    } else {
+                        $('#flipbook').turn('previous');
+                    }
+                });
+
+                // Enable swipe gestures for mobile
+                $(document).on('touchstart', function(event) {
+                    var startX = event.originalEvent.touches[0].clientX;
+                    $(document).on('touchmove', function(event) {
+                        var moveX = event.originalEvent.touches[0].clientX;
+                        if (startX - moveX > 50) {
+                            $('#flipbook').turn('next');
+                        } else if (moveX - startX > 50) {
+                            $('#flipbook').turn('previous');
+                        }
+                        $(document).off('touchmove');
+                    });
+                });
+            }, 1000);
         });
     </script>
 </body>
