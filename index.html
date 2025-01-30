@@ -16,6 +16,7 @@
             justify-content: center;
             height: 100vh;
             overflow: hidden;
+            user-select: none; /* Prevents text/element selection */
         }
         #back-link {
             display: block;
@@ -27,6 +28,7 @@
             text-decoration: none;
             font-family: 'Antonio', sans-serif;
             transition: color 0.75s ease;
+            user-select: none; /* Prevents selection */
         }
         #back-link:hover {
             color: #8b5e48;
@@ -88,6 +90,7 @@
             z-index: 100;
             opacity: 0.7;
             transition: color 0.75s ease;
+            user-select: none; /* Prevents selection */
         }
         .arrow:hover {
             color: #8b5e48;
