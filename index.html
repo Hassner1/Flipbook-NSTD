@@ -31,62 +31,6 @@
 </head>
 <body>
     <div id="flipbook"></div>
-
-<script>
-    $(document).ready(function() {
-        setTimeout(function() {
-            if (typeof $.fn.turn === 'undefined') {
-                console.error("Turn.js did not load properly.");
-                return;
-            }
-
-            var totalPages = 67; // Change this if needed
-            var flipbook = $('#flipbook');
-
-            // Dynamically add all 67 pages
-            for (var i = 1; i <= totalPages; i++) {
-                flipbook.append('<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>');
-            }
-
-            // Initialize flipbook
-            flipbook.turn({
-                width: 800,
-                height: 500,
-                autoCenter: true,
-                display: 'double',
-                acceleration: true
-            });
-
-            // Click to turn pages
-            flipbook.on('click', function(event) {
-                var bookWidth = $(this).width();
-                var clickX = event.pageX - $(this).offset().left;
-
-                if (clickX > bookWidth / 2) {
-                    flipbook.turn('next');
-                } else {
-                    flipbook.turn('previous');
-                }
-            });
-
-            // Swipe support for mobile
-            $(document).on('touchstart', function(event) {
-                var startX = event.originalEvent.touches[0].clientX;
-                $(document).on('touchmove', function(event) {
-                    var moveX = event.originalEvent.touches[0].clientX;
-                    if (startX - moveX > 50) {
-                        flipbook.turn('next');
-                    } else if (moveX - startX > 50) {
-                        flipbook.turn('previous');
-                    }
-                    $(document).off('touchmove');
-                });
-            });
-
-        }, 1000);
-    });
-</script>
-
     <script>
         $(document).ready(function() {
             setTimeout(function() {
@@ -95,35 +39,45 @@
                     return;
                 }
 
-                $('#flipbook').turn({
+                var totalPages = 67; // Set the correct number of pages
+                var flipbook = $('#flipbook');
+
+                // Ensure the flipbook container is properly initialized
+                flipbook.turn({
                     width: 800,
                     height: 500,
                     autoCenter: true,
                     display: 'double',
-                    acceleration: true
+                    acceleration: true,
+                    pages: totalPages
                 });
 
-                // Click right side to go forward, left side to go back
-                $('#flipbook').on('click', function(event) {
+                // Dynamically add pages after initialization
+                for (var i = 1; i <= totalPages; i++) {
+                    flipbook.turn('addPage', '<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>', i);
+                }
+
+                // Click to turn pages
+                flipbook.on('click', function(event) {
                     var bookWidth = $(this).width();
                     var clickX = event.pageX - $(this).offset().left;
 
                     if (clickX > bookWidth / 2) {
-                        $('#flipbook').turn('next');
+                        flipbook.turn('next');
                     } else {
-                        $('#flipbook').turn('previous');
+                        flipbook.turn('previous');
                     }
                 });
 
-                // Enable swipe gestures for mobile
+                // Swipe support for mobile
                 $(document).on('touchstart', function(event) {
                     var startX = event.originalEvent.touches[0].clientX;
                     $(document).on('touchmove', function(event) {
                         var moveX = event.originalEvent.touches[0].clientX;
                         if (startX - moveX > 50) {
-                            $('#flipbook').turn('next');
+                            flipbook.turn('next');
                         } else if (moveX - startX > 50) {
-                            $('#flipbook').turn('previous');
+                            flipbook.turn('previous');
                         }
                         $(document).off('touchmove');
                     });
