@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <title>Mikey Does Art: NSTD Flipbook</title>
+
   <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="turn.min.js"></script> <!-- Or local Turn.js if CDN is blocked -->
 
-  <!-- Make sure we have a responsive viewport for mobile/iPad -->
+  <!-- Responsive Viewport for Mobile/iPad -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Google Font -->
@@ -56,7 +57,7 @@
     /* FLIPBOOK CONTAINER */
     .container {
       position: relative;
-      width: 1080px;   /* A4-ish ratio at 1080×765 */
+      width: 1080px;   /* Desktop default: 1080×765 */
       height: 765px;
       background: #ffffff;
       display: flex;
@@ -69,9 +70,8 @@
       width: 1080px;
       height: 765px;
       background: #ffffff;
-      opacity: 0;      
-      /* Will fade in over 1s after we trigger it in JS */
-      transition: opacity 1s ease;
+      opacity: 0;
+      transition: opacity 1s ease; /* 1s fade once triggered */
       z-index: 1;
     }
     #flipbook.show {
@@ -91,18 +91,17 @@
       background: #ffffff;
     }
 
-    /* HOME BUTTON (TOP RIGHT) */
+    /* HOME BUTTON (TOP LEFT) */
     .home-button {
       position: absolute;
       top: 20px;
-      right: 20px;
+      left: 20px;  /* <--- Moved to top-left */
       z-index: 999;
       width: 50px;
       height: 50px;
       cursor: pointer;
       opacity: 0.8;
-      /* Hover animation: 1s for color change */
-      transition: stroke 1s ease;
+      transition: stroke 1s ease; /* 1s hover color change */
       user-select: none;
     }
     .home-button path {
@@ -123,8 +122,7 @@
       transform: translateY(-50%);
       cursor: pointer;
       z-index: 2;
-      opacity: 0; /* start invisible, we show them after flipbook fades in */
-      /* 1s hover color change, 1s fade for opacity */
+      opacity: 0; /* start invisible, shown after flipbook fade */
       transition: stroke 1s ease, opacity 1s ease;
       user-select: none;
       width: 60px;
@@ -147,207 +145,107 @@
       right: -70px;
     }
 
-    /* --- RESPONSIVE MEDIA QUERIES --- */
+    /* =========================
+       MEDIA QUERIES FOR IPAD
+       & PHONES
+    ==========================*/
 
-    /*
-      1) Screens below 1024px (common iPad landscape breakpoint).
-         We'll scale to 80% of viewport width, preserve ratio (765/1080).
-    */
-    @media (max-width: 1024px) {
+    /* iPad PORTRAIT: 769px – 1024px */
+    @media (min-width: 769px) and (max-width: 1024px) {
       .container {
-        width: 80vw;
-        height: calc(80vw * 765 / 1080);
+        width: 85vw; /* Enough arrow space for portrait iPad */
+        height: calc(85vw * 765 / 1080);
       }
       #flipbook {
         width: 100%;
         height: 100%;
-      }
-      .home-button {
-        width: 40px;
-        height: 40px;
-        top: 15px;
-        right: 15px;
       }
       .arrow {
         width: 50px;
         height: 50px;
       }
       .left-arrow {
-        left: -55px;
+        left: -40px;
       }
       .right-arrow {
-        right: -55px;
+        right: -40px;
+      }
+      .home-button {
+        top: 15px;
+        left: 15px;  /* Keep it a bit inwards on iPad portrait */
+        width: 40px;
+        height: 40px;
       }
     }
 
-    /*
-      2) Screens below 768px (phones).
-         Slightly smaller if you want, or keep 80vw.
+    /* iPad LANDSCAPE: 1025px – 1366px */
+    @media (min-width: 1025px) and (max-width: 1366px) {
+      .container {
+        width: 75vw; /* <--- Using 75vw so arrows don’t get cut off */
+        height: calc(75vw * 765 / 1080);
+      }
+      #flipbook {
+        width: 100%;
+        height: 100%;
+      }
+      .arrow {
+        width: 50px;
+        height: 50px;
+      }
+      .left-arrow {
+        left: -30px; /* reduce negative offset to avoid cutoff */
+      }
+      .right-arrow {
+        right: -30px;
+      }
+      .home-button {
+        top: 20px;
+        left: 20px;
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    /* PHONES: <= 768px
+       Also HIDE the home button on mobile
     */
-  /* iPad / tablets in range 769px – 1024px */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .container {
-    /* Maybe 85% for iPad, so arrows have extra space. Adjust as needed. */
-    width: 85vw;
-    height: calc(85vw * 765 / 1080);
-  }
-  #flipbook {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Arrows smaller & less negative offset */
-  .arrow {
-    width: 50px;
-    height: 50px;
-  }
-  .left-arrow {
-    left: -40px; /* Instead of -55 or -70 */
-  }
-  .right-arrow {
-    right: -40px;
-  }
-
-  /* Home button smaller & more inwards */
-  .home-button {
-    top: 15px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
-  }
-  /* =========================================
-   iPad PORTRAIT: 769px – 1024px
-========================================= */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .container {
-    /* Maybe 85vw to give some arrow space */
-    width: 85vw;
-    height: calc(85vw * 765 / 1080);
-  }
-  #flipbook {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Arrows smaller & a bit less negative offset */
-  .arrow {
-    width: 50px;
-    height: 50px;
-  }
-  .left-arrow {
-    left: -40px; 
-  }
-  .right-arrow {
-    right: -40px;
-  }
-
-  /* Home button slightly smaller + more inwards */
-  .home-button {
-    top: 15px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
-  }
-}
-
-/* =========================================
-   iPad LANDSCAPE: 1025px – 1366px
-   (Many iPads in landscape can go up to 1366 wide)
-========================================= */
-@media (min-width: 1025px) and (max-width: 1366px) {
-  .container {
-    /* Maybe 80vw or 85vw, up to you */
-    width: 80vw;
-    height: calc(80vw * 765 / 1080);
-  }
-  #flipbook {
-    width: 100%;
-    height: 100%;
-  }
-
-  .arrow {
-    width: 50px;
-    height: 50px;
-  }
-  .left-arrow {
-    left: -40px; 
-  }
-  .right-arrow {
-    right: -40px;
-  }
-
-  .home-button {
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-  }
-}
-
-/* =========================================
-   PHONES: <= 768px
-========================================= */
-@media (max-width: 768px) {
-  .container {
-    width: 80vw;
-    height: calc(80vw * 765 / 1080);
-  }
-  #flipbook {
-    width: 100%;
-    height: 100%;
-  }
-  .arrow {
-    width: 40px;
-    height: 40px;
-  }
-  .left-arrow {
-    left: -35px;
-  }
-  .right-arrow {
-    right: -35px;
-  }
-  .home-button {
-    width: 35px;
-    height: 35px;
-    top: 10px;
-    right: 10px;
-  }
-}
-
-}
-
     @media (max-width: 768px) {
       .container {
-        width: 80vw; /* or 75vw if you want smaller on phones */
+        width: 80vw; /* or smaller if you want */
         height: calc(80vw * 765 / 1080);
       }
       #flipbook {
         width: 100%;
         height: 100%;
       }
-      .home-button {
-        width: 35px;
-        height: 35px;
-        top: 10px;
-        right: 10px;
-      }
       .arrow {
         width: 40px;
         height: 40px;
       }
       .left-arrow {
-        left: -45px;
+        left: -35px;
       }
       .right-arrow {
-        right: -45px;
+        right: -35px;
+      }
+
+      /* Hide home button entirely on mobile */
+      .home-button {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
-  <!-- UI Container (flipbook + arrows) -->
+  <!-- Disable Right-Click -->
+  <script>
+    document.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+    }, false);
+  </script>
+
   <div id="ui-container">
-    <!-- HOME BUTTON (Top Right) -->
+    <!-- HOME BUTTON (top-left) -->
     <svg class="home-button" viewBox="0 0 24 24"
          onclick="window.open('https://mikeydoesart.ju.mp/', '_blank')">
       <path d="M3 9.5 L12 3 L21 9.5 V21 H3 Z" />
@@ -370,11 +268,6 @@
   </div>
 
   <script>
-    // Disable Right-Click
-    document.addEventListener('contextmenu', function(e){
-      e.preventDefault();
-    }, false);
-
     $(document).ready(function() {
       // 1) Fade in the UI container
       setTimeout(function() {
@@ -448,7 +341,7 @@
         if ($flipbook.turn('page') !== totalPages) {
           $('.right-arrow').css('opacity', 1);
         }
-      }, 2000); // 2s after we fade in the flipbook
+      }, 2000);
     }
 
     // ARROW Navigation
