@@ -30,12 +30,63 @@
     </style>
 </head>
 <body>
-    <div id="flipbook">
-        <div><img src="page1.jpg" alt="Page 1"></div>
-        <div><img src="page2.jpg" alt="Page 2"></div>
-        <div><img src="page3.jpg" alt="Page 3"></div>
-        <div><img src="page4.jpg" alt="Page 4"></div>
-    </div>
+    <div id="flipbook"></div>
+
+<script>
+    $(document).ready(function() {
+        setTimeout(function() {
+            if (typeof $.fn.turn === 'undefined') {
+                console.error("Turn.js did not load properly.");
+                return;
+            }
+
+            var totalPages = 67; // Change this if needed
+            var flipbook = $('#flipbook');
+
+            // Dynamically add all 67 pages
+            for (var i = 1; i <= totalPages; i++) {
+                flipbook.append('<div><img src="page' + i + '.jpg" alt="Page ' + i + '"></div>');
+            }
+
+            // Initialize flipbook
+            flipbook.turn({
+                width: 800,
+                height: 500,
+                autoCenter: true,
+                display: 'double',
+                acceleration: true
+            });
+
+            // Click to turn pages
+            flipbook.on('click', function(event) {
+                var bookWidth = $(this).width();
+                var clickX = event.pageX - $(this).offset().left;
+
+                if (clickX > bookWidth / 2) {
+                    flipbook.turn('next');
+                } else {
+                    flipbook.turn('previous');
+                }
+            });
+
+            // Swipe support for mobile
+            $(document).on('touchstart', function(event) {
+                var startX = event.originalEvent.touches[0].clientX;
+                $(document).on('touchmove', function(event) {
+                    var moveX = event.originalEvent.touches[0].clientX;
+                    if (startX - moveX > 50) {
+                        flipbook.turn('next');
+                    } else if (moveX - startX > 50) {
+                        flipbook.turn('previous');
+                    }
+                    $(document).off('touchmove');
+                });
+            });
+
+        }, 1000);
+    });
+</script>
+
     <script>
         $(document).ready(function() {
             setTimeout(function() {
