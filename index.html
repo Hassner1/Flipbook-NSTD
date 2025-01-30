@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mikey Does Art - NSTD Flipbook</title>
+  <title>Responsive Turn.js Flipbook</title>
   <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="turn.min.js"></script> <!-- Or your local Turn.js if CDN is blocked -->
@@ -69,16 +69,14 @@
 
     /* FLIPBOOK CONTAINER */
     .container {
-  position: relative;
-  width: 1200px;
-  height: 850px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden; /* Add this line */
-}
-
+      position: relative;
+      width: 1200px;  
+      height: 850px;  
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     /* The flipbook gets a fade-in after Turn.js init */
     #flipbook {
