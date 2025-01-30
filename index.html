@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Interactive Flipbook</title>
-  <!-- jQuery & Turn.js (local or CDN) -->
+  <!-- jQuery & Turn.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Use your local Turn.js or an alternative CDN if needed -->
-  <script src="turn.min.js"></script>
+  <script src="turn.min.js"></script> <!-- Or your local copy -->
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet" />
@@ -17,14 +16,14 @@
     body {
       margin: 0;
       padding: 0;
-      background-color: #ffffff; /* Pure white */
+      background-color: #ffffff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      user-select: none; /* Prevents text selection */
-      overflow: hidden;  /* Hide scrollbars */
+      user-select: none;
+      overflow: hidden;
       font-family: 'Antonio', sans-serif;
     }
 
@@ -47,9 +46,9 @@
     /* --- FLIPBOOK CONTAINER --- */
     #flipbook-container {
       position: relative;
-      width: 90vw;   /* Takes up 90% of screen width */
+      width: 90vw;
       max-width: 90vw;
-      height: 90vh;  /* Up to 90% of screen height */
+      height: 90vh;
       max-height: 90vh;
       display: flex;
       align-items: center;
@@ -60,54 +59,38 @@
     #flipbook {
       /* Start hidden for fade-in animation */
       opacity: 0;
-      transition: opacity 1s ease-in-out 0.25s; /* 1s fade, starts after 0.25s */
+      transition: opacity 1s ease-in-out 0.25s;
       
-      /* Restrict to 85% of container so arrows aren’t obscured */
+      /* 85% of container so arrows aren’t obscured */
       width: 85%;
       height: 85%;
       max-width: 85%;
       max-height: 85%;
 
-      /* Keep A4 ratio using aspect-ratio (if the browser supports it) */
+      /* Keep A4 ratio if browser supports aspect-ratio */
       aspect-ratio: 420 / 297;
 
       position: relative;
     }
-    /* When Turn.js is ready, we add this to fade in the flipbook */
     #flipbook.show {
       opacity: 1;
     }
 
-    /* Each page is a simple DIV that Turn.js handles */
+    /* Each page DIV is handled by Turn.js */
     #flipbook .page {
       width: 100%;
       height: 100%;
-      position: relative; /* For the blur overlay */
+      position: relative;
+      /* Tiny negative margin to reduce gap between pages */
+      margin: 0 -1px; 
     }
+
+    /* If not blurred, normal page. If blurred, we add a style inline. */
     #flipbook img {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* Ensures entire page is visible, no cropping */
+      object-fit: contain; 
       object-position: center;
-    }
-
-    /* --- BLUR OVERLAY --- */
-    .blur-overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.37); /* 37% overlay */
-      backdrop-filter: blur(1px); /* 1px blur */
-      pointer-events: none;       /* Don’t block clicks */
-    }
-
-    .overlay-page {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
     }
 
     /* --- ARROWS --- */
@@ -118,7 +101,7 @@
       font-size: 50px;
       color: #57362b;
       cursor: pointer;
-      z-index: 100; /* On top of the flipbook */
+      z-index: 100;
       opacity: 0.7;
       transition: color 0.75s ease;
       user-select: none;
@@ -135,12 +118,9 @@
   </style>
 </head>
 <body>
-  <!-- BACK LINK -->
   <a id="back-link" href="https://mikeydoesart.ju.mp/" target="_blank">BACK</a>
 
-  <!-- CONTAINER -->
   <div id="flipbook-container">
-    <!-- NAV ARROWS -->
     <span class="arrow left-arrow">&#9664;</span>
     <div id="flipbook"></div>
     <span class="arrow right-arrow">&#9654;</span>
@@ -148,56 +128,56 @@
 
   <script>
     $(document).ready(function() {
-      // Wait briefly before init
       setTimeout(function() {
-        // Check Turn.js
         if (typeof $.fn.turn === 'undefined') {
           console.error('Turn.js did not load properly.');
           return;
         }
 
-        var totalPages = 68; // includes page 68
+        // Updated to 68 pages
+        var totalPages = 68;
+        // Pages you want blurred at 0.5px
         var blurredPages = [14, 15, 16, 17, 18, 20, 21, 26, 39, 40, 41, 42, 43, 44, 64, 65];
         var $flipbook = $('#flipbook');
 
-        // Create each page
         for (var i = 1; i <= totalPages; i++) {
-          var pageHTML = '<div class="page">';
-          pageHTML += '<img src="page' + i + '.jpg" alt="Page ' + i + '">';
-
-          // If page is in blurredPages, add overlay
+          // Build the page markup
+          let extraStyle = '';
           if (blurredPages.includes(i)) {
-            pageHTML += '<img src="overlay1.png" class="overlay-page">';
-            pageHTML += '<div class="blur-overlay"></div>';
+            // Add inline blur to the img
+            extraStyle = 'style="filter: blur(0.5px);"';
           }
-          pageHTML += '</div>';
+          var pageHTML = `
+            <div class="page">
+              <img src="page${i}.jpg" alt="Page ${i}" ${extraStyle}>
+            </div>
+          `;
           $flipbook.append(pageHTML);
         }
 
-        // Init Turn.js
+        // Initialize Turn.js
         $flipbook.turn({
-          width: $flipbook.width(),   // match flipbook's actual width
-          height: $flipbook.height(), // match flipbook's actual height
+          width: $flipbook.width(),
+          height: $flipbook.height(),
           autoCenter: true,
           display: 'double',
           pages: totalPages,
-          duration: 800,   // turn speed
+          duration: 800,
           acceleration: true
         });
 
-        // Fade flipbook in
+        // Fade the flipbook in
         setTimeout(function() {
           $flipbook.addClass('show');
         }, 300);
 
-        // Nav arrows
+        // Arrow Navigation
         $('.left-arrow').click(function() {
           $flipbook.turn('previous');
         });
         $('.right-arrow').click(function() {
           $flipbook.turn('next');
         });
-
       }, 500);
     });
   </script>
