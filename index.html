@@ -215,6 +215,105 @@
     width: 40px;
     height: 40px;
   }
+  /* =========================================
+   iPad PORTRAIT: 769px – 1024px
+========================================= */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    /* Maybe 85vw to give some arrow space */
+    width: 85vw;
+    height: calc(85vw * 765 / 1080);
+  }
+  #flipbook {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Arrows smaller & a bit less negative offset */
+  .arrow {
+    width: 50px;
+    height: 50px;
+  }
+  .left-arrow {
+    left: -40px; 
+  }
+  .right-arrow {
+    right: -40px;
+  }
+
+  /* Home button slightly smaller + more inwards */
+  .home-button {
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* =========================================
+   iPad LANDSCAPE: 1025px – 1366px
+   (Many iPads in landscape can go up to 1366 wide)
+========================================= */
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .container {
+    /* Maybe 80vw or 85vw, up to you */
+    width: 80vw;
+    height: calc(80vw * 765 / 1080);
+  }
+  #flipbook {
+    width: 100%;
+    height: 100%;
+  }
+
+  .arrow {
+    width: 50px;
+    height: 50px;
+  }
+  .left-arrow {
+    left: -40px; 
+  }
+  .right-arrow {
+    right: -40px;
+  }
+
+  .home-button {
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* =========================================
+   PHONES: <= 768px
+========================================= */
+@media (max-width: 768px) {
+  .container {
+    width: 80vw;
+    height: calc(80vw * 765 / 1080);
+  }
+  #flipbook {
+    width: 100%;
+    height: 100%;
+  }
+  .arrow {
+    width: 40px;
+    height: 40px;
+  }
+  .left-arrow {
+    left: -35px;
+  }
+  .right-arrow {
+    right: -35px;
+  }
+  .home-button {
+    width: 35px;
+    height: 35px;
+    top: 10px;
+    right: 10px;
+  }
+}
+
 }
 
     @media (max-width: 768px) {
